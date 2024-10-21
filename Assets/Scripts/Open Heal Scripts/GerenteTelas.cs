@@ -1,3 +1,4 @@
+using MoreMountains.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,16 +40,103 @@ public class GerenteTelas : MonoBehaviour
     public FadeCanvaGroup TelaPrincipal_Principal;
     public FadeCanvaGroup TelaPrincipal_Configuracoes;
     public FadeCanvaGroup TelaPrincipal_Usuario;
+    public GameObject PainelSelecaoGames;
+    public GameObject PainelLateral;
+    public GameObject PainelSelecaoPresets;
     public Text nomeUsuario_text;
+
+    [Header("Tela Seleção de Presets")]
+    public GameObject presetPrefab;
+    public Transform presetParent;
+    public List<LevelPreset> levelPresets;
+    public Text presetDescription;
+
 
     [Header("Telas de Jogo")]
     public UnityEvent OnStartBubbles;
+
 
     [Header("Unity Events")]
     public UnityEvent OnLoginScreenStart;
     public UnityEvent OnConnect, OnConnectError;
     public UnityEvent OnToggleOn, OnToggleOff;
 
+    private void OnEnable()
+    {
+        TelaLogin.GetComponent<CanvasGroup>().alpha = 0;
+        TelaLogin_Inicial.GetComponent<CanvasGroup>().alpha = 0;
+        TelaLogin_Login.GetComponent<CanvasGroup>().alpha = 0;
+
+        TelaPrincipal.GetComponent<CanvasGroup>().alpha = 0;
+        TelaPrincipal_Principal.GetComponent<CanvasGroup>().alpha = 0;
+        TelaPrincipal_Configuracoes.GetComponent<CanvasGroup>().alpha = 0;
+        TelaPrincipal_Usuario.GetComponent<CanvasGroup>().alpha = 0;
+
+        //conecta automaticamente caso senha esteja salva
+        if (PlayerPrefs.HasKey("Login_email"))
+        {
+            startUpLogin = true;
+            email_text.text = PlayerPrefs.GetString("Login_email");
+            password_text.text = PlayerPrefs.GetString("Login_password");
+            StartCoroutine(Conectar());
+        }
+        else
+        {
+
+            if (!ApiHandler.Instance.GetFezLogin())
+                Invoke("InicializarTelaLogin", .1f);
+            else
+                Invoke("InicializarTelaPrincipal", .1f);
+
+            OnLoginScreenStart?.Invoke();
+        }
+
+
+    }
+
+    IEnumerator Conectar()
+    {
+        error_text.text = "";
+
+        yield return StartCoroutine(ApiHandler.Instance.LoginCoroutine(email_text.text, password_text.text));
+
+        if (ApiHandler.Instance.GetFezLogin())
+        {
+            TelaLogin.FadeOut(fadeTime);
+            TelaPrincipal.FadeIn(fadeTime);
+            TelaPrincipal_Principal.FadeIn(fadeTime);
+            AbrirSelecaoJogos();
+            SetupUserName();
+            if (lembraSenha)
+            {
+                PlayerPrefs.SetString("Login_email", email_text.text);
+                PlayerPrefs.SetString("Login_password", password_text.text);
+            }
+            yield return new WaitForEndOfFrame();
+            OnConnect?.Invoke();
+        }
+        else
+        {
+
+            //caso o erro seja no startup, mostrar a mensagem na tela de erro
+            if (startUpLogin)
+            {
+                InicializarTelaStartupError();
+                OnStartUpErrorText.text = ApiHandler.Instance.GetLoginError();
+                startUpLogin = false;
+            }
+            else//caso o erro seja no login normal, mostrar a mensagem na tela de login
+            {
+                error_text.text = ApiHandler.Instance.GetLoginError();
+            }
+
+
+            yield return new WaitForEndOfFrame();
+            OnConnectError?.Invoke();
+        }
+        botaoConectar.interactable = true;
+        loadingIcon.SetActive(false);
+    }
 
     public void SetToggle_LembrarSenha()
     {
@@ -64,7 +152,10 @@ public class GerenteTelas : MonoBehaviour
         }
         lembrarSenha_toggle.isOn = lembraSenha;
     }
-
+    public void SetupUserName()
+    {
+        nomeUsuario_text.text = ApiHandler.Instance.GetPlayerNickName();
+    }
     public void BotaoLogin()
     {
        
@@ -118,69 +209,58 @@ public class GerenteTelas : MonoBehaviour
     
     }
 
-    public void BotaoJogarBubbles()
+    public void BotaoBubblesJogar(string level = "")
     {
-        StartCoroutine(GetBubblesData()); 
+        StartCoroutine(GetBubblesData(level)); 
     }
 
-    IEnumerator GetBubblesData()
+    public void BotaoBubblesPreset()
+    {
+        AbrirSelecaoPresets();
+        InicializarTelaSelecaoPresets();
+
+    }
+
+    IEnumerator GetBubblesData(string level)
     {
         OnStartBubbles?.Invoke();
         yield return new WaitForSeconds(1f);
-        yield return StartCoroutine(ApiHandler.Instance.GetBubbleMatch());
+        yield return StartCoroutine(ApiHandler.Instance.GetBubbleMatch(level));
         SceneManager.LoadScene("Bubbles");
         
         
     }
 
-    public void SetupUserName()
+    
+
+    
+
+
+    public void InicializarTelaSelecaoPresets()
     {
-        nomeUsuario_text.text = ApiHandler.Instance.GetPlayerNickName();
-    }
 
-    IEnumerator Conectar()
-    {
-        error_text.text = "";
-
-        yield return StartCoroutine(ApiHandler.Instance.LoginCoroutine(email_text.text, password_text.text));
-
-        if (ApiHandler.Instance.GetFezLogin())
+        presetDescription.text = ApiHandler.Instance.playerLoginData.data.preset_description ;
+        int i = 1;
+        foreach(levelInfo preset in ApiHandler.Instance.GetPlayerPresets())
         {
-            TelaLogin.FadeOut(fadeTime);
-            TelaPrincipal.FadeIn(fadeTime);
-            TelaPrincipal_Principal.FadeIn(fadeTime);
-            SetupUserName();
-            if (lembraSenha)
-            {
-                PlayerPrefs.SetString("Login_email", email_text.text);
-                PlayerPrefs.SetString("Login_password", password_text.text);
-            }
-            yield return new WaitForEndOfFrame();
-            OnConnect?.Invoke();
-        }
-        else
-        {
-            
-            //caso o erro seja no startup, mostrar a mensagem na tela de erro
-            if(startUpLogin)
-            {
-                InicializarTelaStartupError();
-                OnStartUpErrorText.text = ApiHandler.Instance.GetLoginError();
-                startUpLogin = false;
-            }
-            else//caso o erro seja no login normal, mostrar a mensagem na tela de login
-            {
-                error_text.text = ApiHandler.Instance.GetLoginError();
-            }
-            
+            //instanciar preset no scrollview
+            GameObject p = Instantiate(presetPrefab, presetParent);
+            PresetPrefab pPrefab = p.GetComponent<PresetPrefab>();
 
-            yield return new WaitForEndOfFrame();
-            OnConnectError?.Invoke();
+            //setar nome e descrição do preset
+            pPrefab.SetPresetName(preset.level);
+            pPrefab.SetPresetDescription(preset.description);
+
+            //selecionar preset atual
+            if(i == int.Parse(ApiHandler.Instance.playerLoginData.data.current_level))
+            {
+                pPrefab.SetPresetCurrentLevel();
+            }
+            i++;
         }
-        botaoConectar.interactable = true;
-        loadingIcon.SetActive(false);
+
+        
     }
-
    
     public void InicializarTelaLogin()
     {
@@ -204,42 +284,38 @@ public class GerenteTelas : MonoBehaviour
         TelaPrincipal_Principal.FadeIn(fadeTime);
     }
 
+    public void  SairTelaSelecaoPresets()
+    {
+        //destuir presets antigos
+        foreach (Transform t in presetParent)
+        {
+            if (t.gameObject != presetPrefab)
+                Destroy(t.gameObject);
+        }
+
+        AbrirSelecaoJogos();
+
+    }
+
+    void AbrirSelecaoJogos()
+    {
+        PainelSelecaoGames.SetActive(true);
+        PainelSelecaoPresets.SetActive(false);
+        PainelLateral.SetActive(true);
+    }
+
+    void AbrirSelecaoPresets()
+    {
+        PainelSelecaoGames.SetActive(false);
+        PainelSelecaoPresets.SetActive(true);
+        PainelLateral.SetActive(false);
+    }
+
     void InicializarTelaStartupError()
     {
         OnStartUpErrorCanvas.FadeIn(fadeTime);
     }
 
-    private void OnEnable()
-    {
-        TelaLogin.GetComponent<CanvasGroup>().alpha = 0;
-        TelaLogin_Inicial.GetComponent<CanvasGroup>().alpha = 0;
-        TelaLogin_Login.GetComponent<CanvasGroup>().alpha = 0;
-
-        TelaPrincipal.GetComponent<CanvasGroup>().alpha = 0;
-        TelaPrincipal_Principal.GetComponent<CanvasGroup>().alpha = 0;
-        TelaPrincipal_Configuracoes.GetComponent<CanvasGroup>().alpha = 0;
-        TelaPrincipal_Usuario.GetComponent<CanvasGroup>().alpha = 0;
-
-        //conecta automaticamente caso senha esteja salva
-        if (PlayerPrefs.HasKey("Login_email"))
-        {
-            startUpLogin = true;
-            email_text.text = PlayerPrefs.GetString("Login_email");
-            password_text.text = PlayerPrefs.GetString("Login_password");
-            StartCoroutine(Conectar());
-        }
-        else
-        {
-
-            if (!ApiHandler.Instance.GetFezLogin())
-                Invoke("InicializarTelaLogin", .1f);
-            else
-                Invoke("InicializarTelaPrincipal", .1f);
-
-            OnLoginScreenStart?.Invoke();
-        }
-
-
-    }
+    
 
 }

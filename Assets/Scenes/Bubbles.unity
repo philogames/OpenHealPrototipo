@@ -4774,7 +4774,7 @@ GameObject:
   - component: {fileID: 619226457}
   - component: {fileID: 619226456}
   m_Layer: 5
-  m_Name: "vers\xE3o_label"
+  m_Name: rtr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4796,8 +4796,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 322, y: -173}
-  m_SizeDelta: {x: 147.32, y: 100.24}
+  m_AnchoredPosition: {x: 201.06, y: -173}
+  m_SizeDelta: {x: 258.02, y: 84.04}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &619226456
 MonoBehaviour:
@@ -4832,7 +4832,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: v0.25.2
+  m_Text: Bubbles v0.1
 --- !u!222 &619226457
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5419,7 +5419,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 645554085}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -14788,7 +14788,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Solution: {fileID: 1031635501}
   Bolas_ProximaPartida: []
-  DEBUG_MODE: 1
+  DEBUG_MODE: 0
   qtdBolas_minMax: {x: 10, y: 10}
   speed_minMax: {x: 0.5, y: 1}
   size_minMax: {x: 1, y: 2}
@@ -14798,6 +14798,7 @@ MonoBehaviour:
   randomColor: 1
   loadedSession:
     data:
+      level: 
       match_id: 0
       user_id: 
       user_nickname: 

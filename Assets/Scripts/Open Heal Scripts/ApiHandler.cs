@@ -5,6 +5,7 @@ using MoreMountains.Tools;
 using System.Collections.Generic;
 
 
+
 using System;
 using UnityEngine.UI;
 /// <summary>
@@ -17,6 +18,13 @@ public class ErrorData
 
     public bool isSuccess;
     public List<string> listErrors;
+}
+
+[System.Serializable]
+public class levelInfo
+{
+    public string level;
+    public string description;
 }
 
 [Serializable]
@@ -32,9 +40,15 @@ public class PlayerLoginData
         public string last_name;
         public string nickname;
         public string email;
-        public PlayerProgress player_progress;
+        //public PlayerProgress player_progress;
+        public string current_level;
+        public string preset_description;
+        public string description_current_level;
+        public List<levelInfo> levels;
         public Token token;
     }
+
+    
 
     [Serializable]
     public class PlayerProgress
@@ -42,6 +56,7 @@ public class PlayerLoginData
         public int? matches_played;
         public string total_hours_played;
         public int? total_score;
+        public List<LevelPreset> presets;
     }
 
     [Serializable]
@@ -67,6 +82,30 @@ public class RegisterData
     public string passwordConfirmation;
 }
 
+[System.Serializable]
+public class LevelPreset
+{
+
+    public string levelName;
+    public string levelDescription;
+
+    public LevelPreset(string levelName, string levelDescription)
+    {
+        this.levelName = levelName;
+        this.levelDescription = levelDescription;
+    }
+}
+[System.Serializable]
+public class LevelRequest
+{
+    public string level;
+
+    public LevelRequest(string level)
+    {
+        this.level = level;
+    }
+
+}
 public class ApiHandler : MonoBehaviour
 {
     public static ApiHandler Instance { get; private set; }
@@ -168,9 +207,11 @@ public class ApiHandler : MonoBehaviour
     public IEnumerator LoginCoroutine(string email, string password)
     {
 
-        //string url = "http://openheal-api-dev.wemoga.com.br/api/ApplicationUser/player-login";
-        string url = "https://openheal-api.openheal.org/api/ApplicationUser/player-login";
-        
+        //antigo endpoint que não retorna os presets
+        //string url = "https://openheal-api.openheal.org/api/ApplicationUser/player-login";
+
+        string url = "https://openheal-api.openheal.org/api/ApplicationUser/player-login-with-levels";
+
         Debug.Log(email + "  " + password);
         LoginData loginData = new LoginData
         {
@@ -220,22 +261,30 @@ public class ApiHandler : MonoBehaviour
 
     }
 
+    
     public void GetBubbleMatchData()
     {
-        StartCoroutine(GetBubbleMatch());
+        StartCoroutine(GetBubbleMatch(""));
     }
-
-    public IEnumerator GetBubbleMatch()
+    
+    public IEnumerator GetBubbleMatch(string nivel)
     {
         yield return new WaitForSeconds(1f);
 
-       // string url = "http://openheal-api-dev.wemoga.com.br/api/bubble/play-bubble-match";
         string url = "https://openheal-api.openheal.org/api/bubble/play-bubble-match";
 
-        UnityWebRequest www = new UnityWebRequest(url, "POST");
-        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        www.SetRequestHeader("Authorization", "Bearer " + playerLoginData.data.token.token); // Adicione o token de acesso aqui
+        LevelRequest levelRequest = new LevelRequest(nivel);
+        string jsonData = JsonUtility.ToJson(levelRequest);
 
+        Debug.Log("JSON Data being sent: " + jsonData);
+
+        UnityWebRequest www = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonData);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);//envia o parametro do nivel requisitado
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.SetRequestHeader("Authorization", "Bearer " + playerLoginData.data.token.token); // Adicione o token de acesso aqui
+        
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -303,7 +352,10 @@ public class ApiHandler : MonoBehaviour
         }
     }
 
-    
+    public List<levelInfo> GetPlayerPresets()
+    {
+        return playerLoginData.data.levels;
+    }
 
     public bool GetFezLogin()
     {

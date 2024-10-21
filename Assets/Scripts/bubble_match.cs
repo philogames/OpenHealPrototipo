@@ -5,13 +5,14 @@ using UnityEngine;
 [System.Serializable]
 public class bubble_match
 {
-
+    public string level;
     public int match_id;
     public string user_id;
     public string user_nickname;
     public List<Bola_Info> balls;
     public List<int> screen_resolution;
     public double hit_percentage;
+    
 
     public void SetScreenResolution(int w, int h)
     {

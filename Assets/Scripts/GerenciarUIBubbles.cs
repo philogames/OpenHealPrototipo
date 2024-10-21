@@ -193,7 +193,7 @@ public class GerenciarUIBubbles : MonoBehaviour
             _score += 1;
             finalScoreLabel.text = _score.ToString("0");
             OnScoreAdding?.Invoke();
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForEndOfFrame();
         }
 
         finalScoreLabel.text = GameDataBubbles.Instance.GetLastMatchScore().ToString("0");
@@ -346,7 +346,7 @@ public class GerenciarUIBubbles : MonoBehaviour
     IEnumerator JogarNovamente_Coroutine()
     {
         yield return new WaitForSeconds(1f);
-        yield return StartCoroutine(ApiHandler.Instance.GetBubbleMatch());
+        yield return StartCoroutine(ApiHandler.Instance.GetBubbleMatch(""));
         SceneManager.LoadScene("Bubbles");
     }
 
