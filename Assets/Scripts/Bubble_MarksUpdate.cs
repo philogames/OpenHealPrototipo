@@ -5,6 +5,7 @@ using Mediapipe;
 using Mediapipe.Unity;
 using Mediapipe.Unity.PoseTracking;
 using UnityEngine.Device;
+using MoreMountains.Tools;
 
 
 public class Bubble_MarksUpdate : MonoBehaviour
@@ -16,16 +17,25 @@ public class Bubble_MarksUpdate : MonoBehaviour
 
     [SerializeField]
     public HandPositionData handsData;
+    [SerializeField]
+    public GeneralPosePositionData generalPoseData;
+    [MMReadOnly]
+    public int currentChunck = 0;
+    [MMReadOnly]
+    public int currentTimestampInChunck = 0;
 
     public void SetUpHands()
     {
-      handsData = new HandPositionData();
-       pose = GameObject.FindObjectOfType<PoseTrackingSolution>();
+        handsData = new HandPositionData();
+        generalPoseData = new GeneralPosePositionData();
+
+        pose = GameObject.FindObjectOfType<PoseTrackingSolution>();
         
 
         if (pose != null)
         {
             pose.OnPoseLandmarksUpdated += UpdateHands;
+            //pose.OnPoseLandmarksUpdated += UpdateGeneralPose;
         }
     }
 
@@ -34,6 +44,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         if (pose != null)
         {
             pose.OnPoseLandmarksUpdated -= UpdateHands;
+           // pose.OnPoseLandmarksUpdated -= UpdateGeneralPose;
         }
     }
 
@@ -82,6 +93,24 @@ public class Bubble_MarksUpdate : MonoBehaviour
         UpdateHandCollider(listaMaoDireita, handColliderDireita);
         UpdateHandCollider(listaMaoEsquerda, handColliderEsquerda);
     }
+    public void UpdateGeneralPose(NormalizedLandmarkList landmarks)
+    {
+        int indexLandmark = 0;
+        foreach (var landmark in landmarks.Landmark)
+        {
+            generalPoseData.chunc[currentChunck].timestamp[currentTimestampInChunck].SetTimeStampPoints(indexLandmark, landmark.X, landmark.Y, landmark.Z, landmark.Presence);
+            indexLandmark++;
+        }
+        currentTimestampInChunck++;
+
+        if(currentTimestampInChunck >= generalPoseData.chunc[currentChunck].timestamp.Count)
+        {
+            currentChunck++;
+            currentTimestampInChunck = 0;
+        }
+
+    }
+
 
     void UpdateHandCollider(List<NormalizedLandmark> listDedos, GameObject hand)
     {
@@ -111,7 +140,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         // Converta a posição normalizada para a posição da tela
         float screenX = (1.0f - average.x) * UnityEngine.Screen.currentResolution.width;
         float screenY = (1.0f - average.y) * UnityEngine.Screen.currentResolution.height;
-        float screenZ = 0;
+        float screenZ = average.z;
 
         return new Vector3((int)screenX, (int) screenY, (int)screenZ);
     }

@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5752,6 +5751,10 @@ MonoBehaviour:
   handsData:
     leftHand: []
     rightHand: []
+  generalPoseData:
+    chunc: []
+  currentChunck: 0
+  currentTimestampInChunck: 0
 --- !u!4 &676218129
 Transform:
   m_ObjectHideFlags: 0
@@ -14787,6 +14790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Solution: {fileID: 1031635501}
+  mediaPipeStarted: 0
   Bolas_ProximaPartida: []
   DEBUG_MODE: 0
   qtdBolas_minMax: {x: 10, y: 10}
