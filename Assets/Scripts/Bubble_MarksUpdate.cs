@@ -20,6 +20,8 @@ public class Bubble_MarksUpdate : MonoBehaviour
     [SerializeField]
     public GeneralPosePositionData generalPoseData;
     [MMReadOnly]
+    public bool isCollectingData = false;
+    [MMReadOnly]
     public int currentChunck = 0;
     [MMReadOnly]
     public int currentTimestampInChunck = 0;
@@ -28,6 +30,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
     {
         handsData = new HandPositionData();
         generalPoseData = new GeneralPosePositionData();
+        
 
         pose = GameObject.FindObjectOfType<PoseTrackingSolution>();
         
@@ -35,7 +38,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         if (pose != null)
         {
             pose.OnPoseLandmarksUpdated += UpdateHands;
-            //pose.OnPoseLandmarksUpdated += UpdateGeneralPose;
+            pose.OnPoseLandmarksUpdated += UpdateGeneralPose;
         }
     }
 
@@ -44,11 +47,17 @@ public class Bubble_MarksUpdate : MonoBehaviour
         if (pose != null)
         {
             pose.OnPoseLandmarksUpdated -= UpdateHands;
-           // pose.OnPoseLandmarksUpdated -= UpdateGeneralPose;
+            pose.OnPoseLandmarksUpdated -= UpdateGeneralPose;
         }
     }
 
-    public IEnumerator Start_CollectHandData()
+    public void StartCollectSkeletonData()
+    {
+        isCollectingData = true;
+        StartCoroutine(Start_CollectHandData());
+    }
+
+    IEnumerator Start_CollectHandData()
     {
         
         Vector3 mD = GetAverageHandPosition(listaMaoDireita);
@@ -65,7 +74,15 @@ public class Bubble_MarksUpdate : MonoBehaviour
     public HandPositionData Stop_CollectHandData()
     {
         StopAllCoroutines();
+        isCollectingData = false;
+
         return handsData;
+    }
+
+    public GeneralPosePositionData Stop_CollectGeneralPoseData()
+    {
+        isCollectingData = false;
+        return generalPoseData;
     }
 
     void _update()
@@ -95,7 +112,11 @@ public class Bubble_MarksUpdate : MonoBehaviour
     }
     public void UpdateGeneralPose(NormalizedLandmarkList landmarks)
     {
+        if (!isCollectingData)
+            return;
+
         int indexLandmark = 0;
+
         foreach (var landmark in landmarks.Landmark)
         {
             generalPoseData.chunc[currentChunck].timestamp[currentTimestampInChunck].SetTimeStampPoints(indexLandmark, landmark.X, landmark.Y, landmark.Z, landmark.Presence);
@@ -106,6 +127,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         if(currentTimestampInChunck >= generalPoseData.chunc[currentChunck].timestamp.Count)
         {
             currentChunck++;
+            generalPoseData.chunc.Add(new ChunckedGeneralPosePositionData());
             currentTimestampInChunck = 0;
         }
 
@@ -140,9 +162,9 @@ public class Bubble_MarksUpdate : MonoBehaviour
         // Converta a posição normalizada para a posição da tela
         float screenX = (1.0f - average.x) * UnityEngine.Screen.currentResolution.width;
         float screenY = (1.0f - average.y) * UnityEngine.Screen.currentResolution.height;
-        float screenZ = average.z;
+        float screenZ = (1.0f - average.z);
 
-        return new Vector3((int)screenX, (int) screenY, (int)screenZ);
+        return new Vector3((int)screenX, (int) screenY, screenZ);
     }
 
     public void HideHands()

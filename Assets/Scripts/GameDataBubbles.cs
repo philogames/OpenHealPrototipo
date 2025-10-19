@@ -289,6 +289,13 @@ public class GameDataBubbles : MonoBehaviour
         return json;
     }
 
+    public string GetJsonGeneralPoseData()
+    {
+        GeneralPosePositionData generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectGeneralPoseData();
+        string json = JsonUtility.ToJson(generalPoseData);
+        return json;
+    }
+
     /* para salvar no desktop, descomente o código abaixo e chamne a funcao GerarJsonBubbles() no final da partida
     public void GerarJsonBubbles()
     {

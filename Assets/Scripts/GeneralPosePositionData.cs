@@ -10,12 +10,28 @@ public class GeneralPosePositionData
     [SerializeField]
     public List<ChunckedGeneralPosePositionData> chunc = new List<ChunckedGeneralPosePositionData>();
 
+    //construtor
+    public GeneralPosePositionData()
+    {
+        chunc.Add(new ChunckedGeneralPosePositionData());
+        
+    }
+
 }
 [Serializable]
 public class ChunckedGeneralPosePositionData
 {
     [SerializeField]
     public List<TimestampSkeleton> timestamp = new List<TimestampSkeleton>(500);
+
+    //construtor
+    public ChunckedGeneralPosePositionData()
+    {
+        for (int i = 0; i < 500; i++)
+        {
+            timestamp.Add(new TimestampSkeleton());
+        }
+    }
 }
 
 [Serializable]
@@ -38,18 +54,22 @@ public class SkeletonPoint
 [Serializable]
 public class TimestampSkeleton
 {
-    [SerializeField] public SkeletonPoint nose;
-    [SerializeField] public SkeletonPoint leftShoulder;
-    [SerializeField] public SkeletonPoint rightShoulder;
-    [SerializeField] public SkeletonPoint leftElbow;
-    [SerializeField] public SkeletonPoint rightElbow;
-    [SerializeField] public SkeletonPoint leftWrist;
-    [SerializeField] public SkeletonPoint rightWrist;
-    [SerializeField] public SkeletonPoint leftIndex;
-    [SerializeField] public SkeletonPoint rightIndex;
-    [SerializeField] public SkeletonPoint leftIndexTip;
-    [SerializeField] public SkeletonPoint rightIndexTip;
+    [SerializeField] public SkeletonPoint nose = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint leftShoulder = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint rightShoulder = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint leftElbow = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint rightElbow = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint leftWrist = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint rightWrist = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint leftIndex = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint rightIndex = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint leftIndexTip = new SkeletonPoint();
+    [SerializeField] public SkeletonPoint rightIndexTip = new SkeletonPoint();
 
+    public TimestampSkeleton()
+    {
+        
+    }
 
     /// <summary>
     /// Sets the time stamp points. Returns false if the SkeletonIndex is invalid.
@@ -62,40 +82,43 @@ public class TimestampSkeleton
     /// <returns></returns>
     public bool SetTimeStampPoints(int SkeletonIndex, float x, float y, float z, float likelihood)
     {
+        float screenX = (1.0f - x) * UnityEngine.Screen.currentResolution.width;
+        float screenY = (1.0f - y) * UnityEngine.Screen.currentResolution.height;
+        z = (1.0f - z);
         switch (SkeletonIndex)
         {
             case 0:
-                nose.SetupSkeletonPoint(x, y, z, likelihood);
+                nose.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 11:
-                leftShoulder.SetupSkeletonPoint(x, y, z, likelihood);
+                leftShoulder.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 12:
-                rightShoulder.SetupSkeletonPoint(x, y, z, likelihood);
+                rightShoulder.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 13:
-                leftElbow.SetupSkeletonPoint(x, y, z, likelihood);
+                leftElbow.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 14:
-                rightElbow.SetupSkeletonPoint(x, y, z, likelihood);
+                rightElbow.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 15:
-                leftWrist.SetupSkeletonPoint(x, y, z, likelihood);
+                leftWrist.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 16:
-                rightWrist.SetupSkeletonPoint(x, y, z, likelihood);
+                rightWrist.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 19:
-                leftIndex.SetupSkeletonPoint(x, y, z, likelihood);
+                leftIndex.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 20:
-                rightIndex.SetupSkeletonPoint(x, y, z, likelihood);
+                rightIndex.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 21:
-                leftIndexTip.SetupSkeletonPoint(x, y, z, likelihood);
+                leftIndexTip.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             case 22:
-                rightIndexTip.SetupSkeletonPoint(x, y, z, likelihood);
+                rightIndexTip.SetupSkeletonPoint(screenX, screenY, z, likelihood);
                 break;
             default:
                 return false;

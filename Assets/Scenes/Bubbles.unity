@@ -5753,6 +5753,7 @@ MonoBehaviour:
     rightHand: []
   generalPoseData:
     chunc: []
+  isCollectingData: 0
   currentChunck: 0
   currentTimestampInChunck: 0
 --- !u!4 &676218129

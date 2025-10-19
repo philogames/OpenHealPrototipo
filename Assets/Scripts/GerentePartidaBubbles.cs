@@ -113,7 +113,7 @@ public class GerentePartidaBubbles : MonoBehaviour
           
         }
         Invoke("FimDeJogo", tempoDaUltimaBola+1f);
-        StartCoroutine(GameObject.FindObjectOfType<Bubble_MarksUpdate>().Start_CollectHandData());//começa a coletar dados da mão
+        GameObject.FindObjectOfType<Bubble_MarksUpdate>().StartCollectSkeletonData();//começa a coletar dados da mão
 
     }
 
@@ -137,7 +137,7 @@ public class GerentePartidaBubbles : MonoBehaviour
         if (!GameDataBubbles.Instance.DEBUG_MODE)
         {
 
-         yield return ApiHandler.Instance.SendBubbleMatchData(GameDataBubbles.Instance.GetJsonBubblesData(), GameDataBubbles.Instance.GetJsonHandData());
+         yield return ApiHandler.Instance.SendBubbleMatchData(GameDataBubbles.Instance.GetJsonBubblesData(), GameDataBubbles.Instance.GetJsonHandData(), GameDataBubbles.Instance.GetJsonGeneralPoseData());
 
         }
 

@@ -304,9 +304,8 @@ public class ApiHandler : MonoBehaviour
        return bubbleMatchData;
     }
 
-    public IEnumerator SendBubbleMatchData(string bubblesData, string handsData)
+    public IEnumerator SendBubbleMatchData(string bubblesData, string handsData, string generalPoseData)
     {
-        // string url = "http://openheal-api-dev.wemoga.com.br/api/bubble/bubble-match-result";
 
         string url = "https://openheal-api.openheal.org/api/bubble/bubble-match-result"; 
 
