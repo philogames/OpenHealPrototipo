@@ -137,13 +137,17 @@ public class GerenciarUIBubbles : MonoBehaviour
         activeUI?.GetComponent<FadeCanvaGroup>().FadeOut(.5f);
         UI_TelaInicial.GetComponent<FadeCanvaGroup>().FadeIn(.5f);
         activeUI = UI_TelaInicial;
-        Invoke("SetUpMiniatura", 1);
+        StartCoroutine(SetUpMiniatura());
     }
+
     
     
-    void SetUpMiniatura()
+    IEnumerator SetUpMiniatura()
     {
-       
+       while(!GameDataBubbles.Instance.mediaPipeStarted)
+        { yield return null; }
+
+       yield return new WaitForSeconds(.1f);
         MiniaturaWebCam.texture = TextureWebCam.texture;
         MiniaturaWebCam.color = Color.white;
         maskAnnotation._screen = MiniaturaWebCam;

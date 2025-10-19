@@ -26,6 +26,8 @@ public class GameDataBubbles : MonoBehaviour
     private int ScoreTotal  = 0;
     private float LastMatchScore = 0;
     private int FaseAtual  = 0;
+    [MMReadOnly]
+    public bool mediaPipeStarted = false;
 
     BolaListJsonClass listaBolas = new BolaListJsonClass();
     /// <summary>
@@ -135,6 +137,12 @@ public class GameDataBubbles : MonoBehaviour
     public void StartMediaPipe()
     {
 
+       StartCoroutine(StartMediaPipeCoroutine());
+    }
+
+    IEnumerator StartMediaPipeCoroutine()
+    {
+        yield return new WaitForEndOfFrame();
         PoseTrackingSolution solution = Solution.GetComponent<PoseTrackingSolution>();
         solution.SetScreen(GameObject.FindObjectOfType<Mediapipe.Unity.Screen>());
         solution._worldAnnotationArea = GameObject.Find("UI_Esqueleto").GetComponent<RectTransform>();
@@ -144,11 +152,14 @@ public class GameDataBubbles : MonoBehaviour
         solution._segmentationMaskAnnotationController = GameObject.FindObjectOfType<MaskAnnotationController>();
         solution._roiFromLandmarksAnnotationController = GameObject.FindObjectOfType<NormalizedRectAnnotationController>();
 
-       
+
+        yield return new WaitForEndOfFrame();
         Solution.GetComponent<WebCamSource>().Play();
         solution.graphRunner.Initialize(solution.runningMode);
         Solution.GetComponent<TextureFramePool>().Iniciar();
         solution.Play();
+        mediaPipeStarted = true;
+      
     }
 
     private void Awake()

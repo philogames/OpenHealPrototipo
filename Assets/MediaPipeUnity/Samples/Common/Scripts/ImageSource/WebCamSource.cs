@@ -236,7 +236,7 @@ namespace Mediapipe.Unity
       {
         throw new InvalidOperationException("Not permitted to access cameras");
       }
-
+      
       InitializeWebCamTexture();
       webCamTexture.Play();
       yield return WaitForWebCamTexture();
