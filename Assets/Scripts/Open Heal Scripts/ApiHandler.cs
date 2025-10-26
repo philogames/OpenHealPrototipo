@@ -330,6 +330,7 @@ public class ApiHandler : MonoBehaviour
         // Adicionando o token de acesso no cabeçalho
         www.SetRequestHeader("Authorization", "Bearer " + playerLoginData.data.token.token);
 
+
         // Iniciando a Coroutine para enviar a requisição
         yield return www.SendWebRequest();
 
@@ -353,20 +354,18 @@ public class ApiHandler : MonoBehaviour
         }
     }
 
-    public IEnumerator SendGeneralPoseData(object generalPoseData)
+    public IEnumerator SendGeneralPoseData(string generalPoseData)
     {
-        string url = "https://openheal-api.openheal.org/api/pose-data";
-
-        string jsonData = JsonUtility.ToJson(generalPoseData);
+        string url = "https://openheal-api.openheal.org/api/bubble/pose-data";
 
         UnityWebRequest www = new UnityWebRequest(url, "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(generalPoseData);
         www.uploadHandler = new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
         www.SetRequestHeader("Authorization", "Bearer " + playerLoginData.data.token.token);
 
-        Debug.Log("Enviando generalPoseData: " + jsonData);
+        Debug.Log("GeneralPoseData: " + generalPoseData);
 
         yield return www.SendWebRequest();
 

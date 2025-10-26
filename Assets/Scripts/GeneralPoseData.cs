@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[Serializable]
+[System.Serializable]
 public class GeneralPoseData
 {
+    public int match_id = 0;
     [SerializeField]
     public List<ChunckedGeneralPoseData> chunc = new List<ChunckedGeneralPoseData>();
 
@@ -18,10 +19,10 @@ public class GeneralPoseData
     }
 
 }
-[Serializable]
+[System.Serializable]
 public class ChunckedGeneralPoseData
 {
-    public int match_id;
+  
     [SerializeField]
     public List<TimestampSkeleton> timestamp = new List<TimestampSkeleton>(500);
 
@@ -35,7 +36,7 @@ public class ChunckedGeneralPoseData
     }
 }
 
-[Serializable]
+[System.Serializable]
 public class SkeletonPoint
 {
     public float x;
@@ -52,7 +53,7 @@ public class SkeletonPoint
     }
 }
 
-[Serializable]
+[System.Serializable]
 public class TimestampSkeleton
 {
     [SerializeField] public SkeletonPoint nose = new SkeletonPoint();

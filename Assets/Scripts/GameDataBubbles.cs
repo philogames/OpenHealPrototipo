@@ -7,6 +7,7 @@ using System.IO;
 using Mediapipe.Unity;
 using Mediapipe.Unity.PoseTracking;
 using UnityEngine.Device;
+using Newtonsoft.Json;
 [Serializable]
 public class BolaListJsonClass
 {
@@ -36,6 +37,7 @@ public class GameDataBubbles : MonoBehaviour
     /// </summary>
     public List<Bola_Info> Bolas_ProximaPartida; 
 
+    [Header("DEBUG SETTINGS")]
     [Tooltip("Ative para gerar a lista de bolas aleatoriamente, sem acessar o servidor")]
     public bool DEBUG_MODE = false;
     #region DEBUG PARAMETERS
@@ -55,6 +57,9 @@ public class GameDataBubbles : MonoBehaviour
     public bool randomColor = false;
     #endregion
 
+    public bool savePoseDataOnDesktop = false;
+
+    [Header("Loaded Session Data")]
     [SerializeField]
     public bubble_match_data loadedSession;
 
@@ -291,10 +296,44 @@ public class GameDataBubbles : MonoBehaviour
 
     public string GetJsonGeneralPoseData()
     {
-        GeneralPoseData generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectGeneralPoseData();
-        string json = JsonUtility.ToJson(generalPoseData);
+        /*
+         GeneralPoseData generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectGeneralPoseData();
+        if (savePoseDataOnDesktop)
+        {
+            string jsonPretty = JsonUtility.ToJson(generalPoseData, true);
+            // salva o json em um arquivo txt para debug no desktop 
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filePath = System.IO.Path.Combine(desktopPath, "generalPoseData.json");
+            System.IO.File.WriteAllText(filePath, jsonPretty);
+            Debug.Log("Arquivo salvo em: " + filePath);
+
+        }
+
+         string json = JsonUtility.ToJson(generalPoseData);
+        */
+
+        PoseLandmarkChunkDTO generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectPoseLandmarkChunkDTO();
+        generalPoseData.match_id = loadedSession.data.match_id;
+
+        StartCoroutine(generalPoseData.LogTimestamps());
+
+        if (savePoseDataOnDesktop)
+        {
+            string jsonPretty = JsonConvert.SerializeObject(generalPoseData, Formatting.Indented);
+            // salva o json em um arquivo txt para debug no desktop 
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filePath = System.IO.Path.Combine(desktopPath, "generalPoseData.json");
+            System.IO.File.WriteAllText(filePath, jsonPretty);
+            Debug.Log("Arquivo salvo em: " + filePath);
+
+        }
+
+        string json = JsonConvert.SerializeObject(generalPoseData, Formatting.None);
+
         return json;
     }
+
+   
 
     /* para salvar no desktop, descomente o código abaixo e chamne a funcao GerarJsonBubbles() no final da partida
     public void GerarJsonBubbles()

@@ -17,8 +17,11 @@ public class Bubble_MarksUpdate : MonoBehaviour
 
     [SerializeField]
     public HandPositionData handsData;
+ //   [SerializeField]
+ //   public GeneralPoseData generalPoseData;
+
     [SerializeField]
-    public GeneralPoseData generalPoseData;
+    public PoseLandmarkChunkDTO poseLandmarkChunkDTO;
     [MMReadOnly]
     public bool isCollectingData = false;
     [MMReadOnly]
@@ -29,8 +32,9 @@ public class Bubble_MarksUpdate : MonoBehaviour
     public void SetUpHands()
     {
         handsData = new HandPositionData();
-        generalPoseData = new GeneralPoseData();
-        
+     //   generalPoseData = new GeneralPoseData();
+        poseLandmarkChunkDTO = new PoseLandmarkChunkDTO();
+
 
         pose = GameObject.FindObjectOfType<PoseTrackingSolution>();
         
@@ -79,12 +83,22 @@ public class Bubble_MarksUpdate : MonoBehaviour
         return handsData;
     }
 
+    /*
     public GeneralPoseData Stop_CollectGeneralPoseData()
     {
         isCollectingData = false;
         return generalPoseData;
     }
+    */
 
+    
+    public PoseLandmarkChunkDTO Stop_CollectPoseLandmarkChunkDTO()
+    {
+        isCollectingData = false;
+        return poseLandmarkChunkDTO;
+
+    }
+    
     void _update()
     {
       //  pose.graphRunner.OnPoseLandmarksOutput
@@ -110,17 +124,93 @@ public class Bubble_MarksUpdate : MonoBehaviour
         UpdateHandCollider(listaMaoDireita, handColliderDireita);
         UpdateHandCollider(listaMaoEsquerda, handColliderEsquerda);
     }
+
+    float cooldownUpdateGeneralPose = 0f;
     public void UpdateGeneralPose(NormalizedLandmarkList landmarks)
     {
         if (!isCollectingData)
             return;
 
+        cooldownUpdateGeneralPose += Time.deltaTime;
+
+        if(cooldownUpdateGeneralPose > 0.1f)
+        {
+            cooldownUpdateGeneralPose = 0f;
+        }
+        else
+        {
+            return;
+        }
+
+
+
         int indexLandmark = 0;
 
+        
+        foreach (var landmark in landmarks.Landmark)
+        {
+            string landmarkName = "";
+            switch (indexLandmark)
+            {
+                case 0:
+                    landmarkName = "nose";
+                    break;
+                case 11:
+                    landmarkName = "leftShoulder";
+                    break;
+                case 12:
+                    landmarkName = "rightShoulder";
+                    break;
+                case 13:
+                    landmarkName = "leftElbow";
+                    break;
+                case 14:
+                    landmarkName = "rightElbow";
+                    break;
+                case 15:
+                    landmarkName = "leftWrist";
+                    break;
+                case 16:
+                    landmarkName = "rightWrist";
+                    break;
+                case 23:
+                    landmarkName = "leftHip";
+                    break;
+                case 24:
+                    landmarkName = "rightHip";
+                    break;
+                case 25:
+                    landmarkName = "leftKnee";
+                    break;
+                case 26:
+                    landmarkName = "rightKnee";
+                    break;
+                case 27:
+                    landmarkName = "leftAnkle";
+                    break;
+                case 28:
+                    landmarkName = "rightAnkle";
+                    break;
+
+                default:
+                    indexLandmark++;
+                    continue;
+            }
+            poseLandmarkChunkDTO.GetCurrentTimestamp()?.SetLandmark(landmarkName, landmark.X, landmark.Y, landmark.Z, landmark.Presence);
+
+            //mostra no console os valores dos pontos adicionados
+           // Debug.Log("Landmark: " + landmarkName + " X: " + landmark.X + " Y: " + landmark.Y + " Z: " + landmark.Z + " Likelihood: " + landmark.Presence);
+
+            indexLandmark++;
+
+        }
+        
+        
+        /*
         foreach (var landmark in landmarks.Landmark)
         {
             generalPoseData.chunc[currentChunck].timestamp[currentTimestampInChunck].SetTimeStampPoints(indexLandmark, landmark.X, landmark.Y, landmark.Z, landmark.Presence);
-            indexLandmark++;
+            indexLandmark++; 
         }
         currentTimestampInChunck++;
 
@@ -130,7 +220,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
             generalPoseData.chunc.Add(new ChunckedGeneralPoseData());
             currentTimestampInChunck = 0;
         }
-
+        */
     }
 
 
