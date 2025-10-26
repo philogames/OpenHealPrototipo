@@ -291,7 +291,7 @@ public class GameDataBubbles : MonoBehaviour
 
     public string GetJsonGeneralPoseData()
     {
-        GeneralPosePositionData generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectGeneralPoseData();
+        GeneralPoseData generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectGeneralPoseData();
         string json = JsonUtility.ToJson(generalPoseData);
         return json;
     }

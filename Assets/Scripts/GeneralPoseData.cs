@@ -5,27 +5,28 @@ using UnityEngine;
 
 
 [Serializable]
-public class GeneralPosePositionData
+public class GeneralPoseData
 {
     [SerializeField]
-    public List<ChunckedGeneralPosePositionData> chunc = new List<ChunckedGeneralPosePositionData>();
+    public List<ChunckedGeneralPoseData> chunc = new List<ChunckedGeneralPoseData>();
 
     //construtor
-    public GeneralPosePositionData()
+    public GeneralPoseData()
     {
-        chunc.Add(new ChunckedGeneralPosePositionData());
+        chunc.Add(new ChunckedGeneralPoseData());
         
     }
 
 }
 [Serializable]
-public class ChunckedGeneralPosePositionData
+public class ChunckedGeneralPoseData
 {
+    public int match_id;
     [SerializeField]
     public List<TimestampSkeleton> timestamp = new List<TimestampSkeleton>(500);
 
     //construtor
-    public ChunckedGeneralPosePositionData()
+    public ChunckedGeneralPoseData()
     {
         for (int i = 0; i < 500; i++)
         {

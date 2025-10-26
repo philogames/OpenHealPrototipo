@@ -18,7 +18,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
     [SerializeField]
     public HandPositionData handsData;
     [SerializeField]
-    public GeneralPosePositionData generalPoseData;
+    public GeneralPoseData generalPoseData;
     [MMReadOnly]
     public bool isCollectingData = false;
     [MMReadOnly]
@@ -29,7 +29,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
     public void SetUpHands()
     {
         handsData = new HandPositionData();
-        generalPoseData = new GeneralPosePositionData();
+        generalPoseData = new GeneralPoseData();
         
 
         pose = GameObject.FindObjectOfType<PoseTrackingSolution>();
@@ -79,7 +79,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         return handsData;
     }
 
-    public GeneralPosePositionData Stop_CollectGeneralPoseData()
+    public GeneralPoseData Stop_CollectGeneralPoseData()
     {
         isCollectingData = false;
         return generalPoseData;
@@ -127,7 +127,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         if(currentTimestampInChunck >= generalPoseData.chunc[currentChunck].timestamp.Count)
         {
             currentChunck++;
-            generalPoseData.chunc.Add(new ChunckedGeneralPosePositionData());
+            generalPoseData.chunc.Add(new ChunckedGeneralPoseData());
             currentTimestampInChunck = 0;
         }
 

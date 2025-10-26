@@ -304,7 +304,7 @@ public class ApiHandler : MonoBehaviour
        return bubbleMatchData;
     }
 
-    public IEnumerator SendBubbleMatchData(string bubblesData, string handsData, string generalPoseData)
+    public IEnumerator SendBubbleMatchData(string bubblesData, string handsData)
     {
 
         string url = "https://openheal-api.openheal.org/api/bubble/bubble-match-result"; 
@@ -313,11 +313,13 @@ public class ApiHandler : MonoBehaviour
         // Converta as strings para binário
         byte[] bubblesDataBytes = System.Text.Encoding.UTF8.GetBytes(bubblesData);
         byte[] handsDataBytes = System.Text.Encoding.UTF8.GetBytes(handsData);
+      
 
         // Criação do form
         List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
         formData.Add(new MultipartFormFileSection("BubblesData", bubblesDataBytes, "bubblesData.txt", "text/plain"));
         formData.Add(new MultipartFormFileSection("HandsData", handsDataBytes, "handsData.txt", "text/plain"));
+       
 
         UnityWebRequest www = UnityWebRequest.Post(url, formData);
         
@@ -351,6 +353,32 @@ public class ApiHandler : MonoBehaviour
         }
     }
 
+    public IEnumerator SendGeneralPoseData(object generalPoseData)
+    {
+        string url = "https://openheal-api.openheal.org/api/pose-data";
+
+        string jsonData = JsonUtility.ToJson(generalPoseData);
+
+        UnityWebRequest www = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.SetRequestHeader("Authorization", "Bearer " + playerLoginData.data.token.token);
+
+        Debug.Log("Enviando generalPoseData: " + jsonData);
+
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Erro ao enviar generalPoseData: " + www.error + "\nResponse: " + www.downloadHandler.text);
+        }
+        else
+        {
+            Debug.Log("generalPoseData enviado com sucesso: " + www.downloadHandler.text);
+        }
+    }
     public List<levelInfo> GetPlayerPresets()
     {
         return playerLoginData.data.levels;
