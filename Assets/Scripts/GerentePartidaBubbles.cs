@@ -54,9 +54,6 @@ public class GerentePartidaBubbles : MonoBehaviour
 
     private void Update()
     {
-
-        
-
         if (partidaIniciada)
         {
             tempoAtual += Time.deltaTime;
@@ -122,6 +119,12 @@ public class GerentePartidaBubbles : MonoBehaviour
         StartCoroutine(FimDeJogo_Coroutine());
     }
 
+
+    public void SendTimestampData()
+    {
+      StartCoroutine(ApiHandler.Instance.SendGeneralPoseDataCoroutine(GameDataBubbles.Instance.GetJsonGeneralPoseDataChunk()));
+    }
+
     IEnumerator FimDeJogo_Coroutine()
     {
         OnFimPartida?.Invoke();
@@ -136,11 +139,8 @@ public class GerentePartidaBubbles : MonoBehaviour
 
         if (!GameDataBubbles.Instance.DEBUG_MODE)
         {
-
             yield return ApiHandler.Instance.SendBubbleMatchData(GameDataBubbles.Instance.GetJsonBubblesData(), GameDataBubbles.Instance.GetJsonHandData());
-            yield return new WaitForEndOfFrame();
-            yield return ApiHandler.Instance.SendGeneralPoseData(GameDataBubbles.Instance.GetJsonGeneralPoseData());
-
+           // yield return ApiHandler.Instance.SendGeneralPoseData(GameDataBubbles.Instance.GetJsonGeneralPoseDataChunk());
         }
 
         

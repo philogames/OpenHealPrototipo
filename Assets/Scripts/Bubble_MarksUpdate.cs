@@ -92,9 +92,9 @@ public class Bubble_MarksUpdate : MonoBehaviour
     */
 
     
-    public PoseLandmarkChunkDTO Stop_CollectPoseLandmarkChunkDTO()
+    public PoseLandmarkChunkDTO SendChunk()
     {
-        isCollectingData = false;
+        
         return poseLandmarkChunkDTO;
 
     }
@@ -131,6 +131,8 @@ public class Bubble_MarksUpdate : MonoBehaviour
         if (!isCollectingData)
             return;
 
+
+        /* descomentar se precisar de cooldown de coleta, ao invez de ser a cada frame
         cooldownUpdateGeneralPose += Time.deltaTime;
 
         if(cooldownUpdateGeneralPose > 0.1f)
@@ -141,7 +143,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
         {
             return;
         }
-
+        */
 
 
         int indexLandmark = 0;
@@ -196,7 +198,7 @@ public class Bubble_MarksUpdate : MonoBehaviour
                     indexLandmark++;
                     continue;
             }
-            poseLandmarkChunkDTO.GetCurrentTimestamp()?.SetLandmark(landmarkName, landmark.X, landmark.Y, landmark.Z, landmark.Presence);
+            poseLandmarkChunkDTO.GetCurrentTimestamp()?.SetLandmark(landmarkName, landmark.X, landmark.Y, landmark.Z, landmark.Presence, landmark.Visibility);
 
             //mostra no console os valores dos pontos adicionados
            // Debug.Log("Landmark: " + landmarkName + " X: " + landmark.X + " Y: " + landmark.Y + " Z: " + landmark.Z + " Likelihood: " + landmark.Presence);

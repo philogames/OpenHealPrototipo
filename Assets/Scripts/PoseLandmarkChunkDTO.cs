@@ -12,26 +12,36 @@ public class PoseLandmarkChunkDTO
     [SerializeField, JsonProperty(Order = 2)]
     public Dictionary<string, PoseTimestampDTO> timestamps = new Dictionary<string, PoseTimestampDTO>();
 
-    int currentTimestamp = 0;
+   
+    float timeOnStart = -1;
 
-    
-    
     //get current timestamp
     public PoseTimestampDTO GetCurrentTimestamp()
     {
-       
-        if(timestamps.Count >= 500)
+        if(timeOnStart == -1)
         {
-            Debug.LogWarning("Maximum number of timestamps reached (500).");
-            return null;
+           
+            timeOnStart = Time.time;
         }
 
-        string timestampKey = currentTimestamp.ToString();
+        if (timestamps.Count >= 60)
+        {
+            ApiHandler.Instance.SendGeneralPoseData(GameDataBubbles.Instance.GetJsonGeneralPoseDataChunk());
+            timestamps.Clear();
+            
+            Debug.Log("Maximum number of timestamps reached (60).");
+        
+        }
+
+
+        string timestampKey =  (Time.time - timeOnStart).ToString();
+       // Debug.Log($"Current timestamp key: {timestampKey}");
         if (!timestamps.ContainsKey(timestampKey))
         {
-            timestamps[timestampKey] = new PoseTimestampDTO();
+            timestamps.Add(timestampKey, new PoseTimestampDTO());
+           // timestamps[timestampKey] = new PoseTimestampDTO();
         }
-        currentTimestamp++;
+       
         return timestamps[timestampKey];
     }
 
@@ -47,7 +57,8 @@ public class PoseLandmarkChunkDTO
             {
                 string landmarkName = landmarkKvp.Key;
                 PoseLandmarkDataDTO data = landmarkKvp.Value;
-                Debug.Log($"  {landmarkName}: x={data.x}, y={data.y}, z={data.z}, likelihood={data.likelihood}");
+                Debug.Log($"  {landmarkName}: x={data.x}, y={data.y}, z={data.z}, presence={data.presence}");
+                Debug.Log($"  {landmarkName}: visibility={data.visibility}");
                 yield return null; // Yield to avoid blocking
             }
         }
@@ -82,11 +93,11 @@ public class PoseTimestampDTO
 
     }
 
-    public void SetLandmark(string landmarkName, double x, double y, double z, double likelihood)
+    public void SetLandmark(string landmarkName, double x, double y, double z, double presence, double visibility)
     {
         if (landmarks.ContainsKey(landmarkName))
         {
-            landmarks[landmarkName].SetLandmarkData(x, y, z, likelihood);
+            landmarks[landmarkName].SetLandmarkData(x, y, z, presence, visibility);
         }
     }
 
@@ -102,15 +113,19 @@ public class PoseLandmarkDataDTO
     public double x { get; set; }
     public double y { get; set; }
     public double z { get; set; }
-    public double likelihood { get; set; }
+
+    public double presence { get; set; }
+
+    public double visibility { get; set; }
 
 
-    public void SetLandmarkData(double _x, double _y, double _z, double _likelihood)
+    public void SetLandmarkData(double _x, double _y, double _z, double _presence, double _visibility)
     {
         x = _x;
         y = _y;
         z = _z;
-        likelihood = _likelihood;
+        presence = _presence;
+        visibility = _visibility;
     }
 
 }

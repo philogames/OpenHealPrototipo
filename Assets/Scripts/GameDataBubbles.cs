@@ -245,38 +245,7 @@ public class GameDataBubbles : MonoBehaviour
         listaBolas.bolas.Add(bola);
     }
 
-    /*
-    public BolaListJsonClass GetListaBolasJson()
-    {
-        return listaBolas;
-    }
-    */
-    /* para salvar no desktop, descomente o código abaixo e chame a função GerarJsonHandData() no final da partida
-    public void GerarJsonHandData(HandPositionData handsData)
-    {
-        string json = JsonUtility.ToJson(handsData);
-
-        // Obtem o caminho para o Desktop do usuário atual
-        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-        // Constrói o caminho para a pasta OpenHeal no Desktop
-        string openHealPath = Path.Combine(desktopPath, "OpenHeal");
-
-        // Constrói o caminho para a subpasta Bubbles dentro de OpenHeal
-        string bubblesPath = Path.Combine(openHealPath, "Bubbles");
-
-        // Verifica se a pasta Bubbles existe, se não, cria
-        if (!Directory.Exists(bubblesPath))
-        {
-            Directory.CreateDirectory(bubblesPath);
-        }
-
-        // Constrói o caminho final do arquivo, incluindo o nome do arquivo com a data e hora atuais
-        string finalPath = Path.Combine(bubblesPath, "Hands Data " + DateTime.Now.ToString("dd-MM-yy--HH-mm-ss") + ".json");
-
-        File.WriteAllText(finalPath, json);
-    }
-    */
+    
 
     public string GetJsonHandData()
     {
@@ -294,37 +263,25 @@ public class GameDataBubbles : MonoBehaviour
         return json;
     }
 
-    public string GetJsonGeneralPoseData()
+    int currentChunk = 0;
+    public string GetJsonGeneralPoseDataChunk()
     {
-        /*
-         GeneralPoseData generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectGeneralPoseData();
-        if (savePoseDataOnDesktop)
-        {
-            string jsonPretty = JsonUtility.ToJson(generalPoseData, true);
-            // salva o json em um arquivo txt para debug no desktop 
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string filePath = System.IO.Path.Combine(desktopPath, "generalPoseData.json");
-            System.IO.File.WriteAllText(filePath, jsonPretty);
-            Debug.Log("Arquivo salvo em: " + filePath);
+       
 
-        }
-
-         string json = JsonUtility.ToJson(generalPoseData);
-        */
-
-        PoseLandmarkChunkDTO generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().Stop_CollectPoseLandmarkChunkDTO();
+        PoseLandmarkChunkDTO generalPoseData = GameObject.FindObjectOfType<Bubble_MarksUpdate>().SendChunk();
         generalPoseData.match_id = loadedSession.data.match_id;
 
-        StartCoroutine(generalPoseData.LogTimestamps());
+       // StartCoroutine(generalPoseData.LogTimestamps());
 
         if (savePoseDataOnDesktop)
         {
             string jsonPretty = JsonConvert.SerializeObject(generalPoseData, Formatting.Indented);
             // salva o json em um arquivo txt para debug no desktop 
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string filePath = System.IO.Path.Combine(desktopPath, "generalPoseData.json");
+            string filePath = System.IO.Path.Combine(desktopPath, "generalPoseData_Chunk " + currentChunk +".json");
             System.IO.File.WriteAllText(filePath, jsonPretty);
             Debug.Log("Arquivo salvo em: " + filePath);
+            currentChunk++;
 
         }
 
@@ -334,41 +291,6 @@ public class GameDataBubbles : MonoBehaviour
     }
 
    
-
-    /* para salvar no desktop, descomente o código abaixo e chamne a funcao GerarJsonBubbles() no final da partida
-    public void GerarJsonBubbles()
-    {
-        
-        bubble_match_data resultadoFinal = loadedSession;
-        resultadoFinal.data.balls = listaBolas.bolas;
-        string json = JsonUtility.ToJson(resultadoFinal);
-
-
-        
-         Debug.Log("SALVOUUUUUUUUU" + Application.persistentDataPath);
-        // Obtem o caminho para o Desktop do usuário atual
-        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-        // Constrói o caminho para a pasta OpenHeal no Desktop
-        string openHealPath = Path.Combine(desktopPath, "OpenHeal");
-
-        // Constrói o caminho para a subpasta Bubbles dentro de OpenHeal
-        string bubblesPath = Path.Combine(openHealPath, "Bubbles");
-
-        // Verifica se a pasta Bubbles existe, se não, cria
-        if (!Directory.Exists(bubblesPath))
-        {
-            Directory.CreateDirectory(bubblesPath);
-        }
-
-        // Constrói o caminho final do arquivo, incluindo o nome do arquivo com a data e hora atuais
-        string finalPath = Path.Combine(bubblesPath, "Bubbles Data " + DateTime.Now.ToString("dd-MM-yy--HH-mm-ss") + ".json");
-
-        File.WriteAllText(finalPath, json);
-        
-    }
-    */
-
 
     public void LoadJson(string file)
     {

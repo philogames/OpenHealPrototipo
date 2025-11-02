@@ -354,7 +354,12 @@ public class ApiHandler : MonoBehaviour
         }
     }
 
-    public IEnumerator SendGeneralPoseData(string generalPoseData)
+    public void SendGeneralPoseData(string generalPoseData)
+    {
+        StartCoroutine(SendGeneralPoseDataCoroutine(generalPoseData));
+    }
+
+    public IEnumerator SendGeneralPoseDataCoroutine(string generalPoseData)
     {
         string url = "https://openheal-api.openheal.org/api/bubble/pose-data";
 
@@ -365,7 +370,7 @@ public class ApiHandler : MonoBehaviour
         www.SetRequestHeader("Content-Type", "application/json");
         www.SetRequestHeader("Authorization", "Bearer " + playerLoginData.data.token.token);
 
-        Debug.Log("GeneralPoseData: " + generalPoseData);
+      //  Debug.Log("GeneralPoseData: " + generalPoseData);
 
         yield return www.SendWebRequest();
 

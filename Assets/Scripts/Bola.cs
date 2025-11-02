@@ -93,8 +93,8 @@ public class Bola : MonoBehaviour
 
         //transforma a posicao para coordenadas do mundo
         Vector2 screenPos = Camera.main.ViewportToWorldPoint(info.launch_coord.GetLaunchCoord());
-        Debug.Log("Viewport Coord: " + info.launch_coord.GetLaunchCoord());
-        Debug.Log("World Coord: " + screenPos);
+       // Debug.Log("Viewport Coord: " + info.launch_coord.GetLaunchCoord());
+      //  Debug.Log("World Coord: " + screenPos);
 
      
         //seta a posição inicial (launch_coord)
